@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>任务管理系统 - 纯色背景版</title>
+  <!-- 内联CSS样式 -->
+  <style>
+    /* 导入Google字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* CSS变量 */
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary-color: #06b6d4;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --dark-color: #1f2937;
+      --light-color: #f9fafb;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* 基础样式 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      /* 使用纯色背景 */
+      background-color: #1a365d;
+    }
+    
+    /* 背景切换按钮 */
+    .bg-switcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .bg-option {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid white;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    .bg-option:hover {
+      transform: scale(1.1);
+    }
+    
+    .bg-option.active {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+    }
+    
+    .bg-option.gradient {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .bg-option.solid {
+      background: #1a365d;
+    }
+    
+    .bg-option.image {
+      background: url('https://picsum.photos/seed/taskmanager/100/100.jpg') no-repeat center center;
+      background-size: cover;
+    }
+    
+    .bg-option.pattern {
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23333"/><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/><circle cx="50" cy="50" r="30" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/><circle cx="50" cy="50" r="20" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>');
+      background-size: 100px 100px;
+    }
+    
+    /* 容器 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    
+    /* 头部 */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-md);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* 导航 */
+    nav {
+      display: none;
+    }
+    
+    @media (min-width: 768px) {
+      nav {
+        display: flex;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 0.25rem;
+        border-radius: 12px;
+        backdrop-filter: blur(5px);
+      }
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--dark-color);
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      opacity: 0;
+      transition: var(--transition);
+      z-index: -1;
+    }
+    
+    .nav-link:hover {
+      transform: translateY(-2px);
+      color: var(--primary-color);
+    }
+    
+    .nav-link.active {
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .nav-link.active::before {
+      opacity: 1;
+    }
+    
+    .nav-link i {
+      margin-right: 0.5rem;
+    }
+    
+    /* 移动端菜单 */
+    .mobile-menu-btn {
+      display: block;
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      color: var(--dark-color);
+      font-size: 1.25rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    
+    .mobile-menu-btn:hover {
+      background: white;
+      transform: translateY(-2px);
+    }
+    
+    @media (min-width: 768px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+    
+    .mobile-menu {
+      display: none;
+      margin-top: 1rem;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .mobile-menu.show {
+      display: block;
+    }
+    
+    .mobile-menu .nav-link {
+      display: block;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+    
+    /* 主要内容 */
+    main {
+      flex: 1;
+      padding: 2rem 0;
+    }
+    
+    .view {
+      display: block;
+    }
+    
+    .view.hidden {
+      display: none;
+    }
+    
+    /* 页面标题 */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* 卡片 */
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      opacity: 0;
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .card:hover::before {
+      opacity: 1;
+    }
+    
+    /* 按钮 */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--dark-color);
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-secondary:hover {
+      background: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger-color), #dc2626);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+    
+    /* 表单 */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      transition: var(--transition);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      background: white;
+    }
+    
+    /* 模态框 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+    
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+      padding: 2rem;
+      width: 100%;
+      max-width: 32rem;
+      margin: 0 1rem;
+      transform: scale(0.9);
+      transition: var(--transition);
+    }
+    
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .modal-close {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      color: var(--dark-color);
+      font-size: 1.25rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .modal-close:hover {
+      background: var(--light-color);
+      transform: rotate(90deg);
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    /* 进度条 */
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: var(--border-color);
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 0.75rem 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.5s ease;
+    }
+    
+    .progress-primary {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .progress-success {
+      background: linear-gradient(90deg, var(--success-color), #059669);
+    }
+    
+    /* 统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+    }
+    
+    .stat-card.primary::before {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .stat-card.success::before {
+      background: linear-gradient(90deg, var(--success-color), #059669);
+    }
+    
+    .stat-card.warning::before {
+      background: linear-gradient(90deg, var(--warning-color), #d97706);
+    }
+    
+    .stat-card.danger::before {
+      background: linear-gradient(90deg, var(--danger-color), #dc2626);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    /* 任务卡片特殊样式 */
+    .task-card {
+      position: relative;
+    }
+    
+    .task-card.completed {
+      opacity: 0.7;
+    }
+    
+    .task-card.completed .task-title {
+      text-decoration: line-through;
+      color: #6b7280;
+    }
+    
+    .task-priority {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .priority-high {
+      background: var(--danger-color);
+    }
+    
+    .priority-medium {
+      background: var(--warning-color);
+    }
+    
+    .priority-low {
+      background: var(--success-color);
+    }
+    
+    /* 课程卡片特殊样式 */
+    .course-color-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 0.75rem;
+    }
+    
+    /* 页脚 */
+    footer {
+      background: rgba(31, 41, 55, 0.9);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 2rem 0;
+      margin-top: auto;
+    }
+    
+    .footer-content {
+      text-align: center;
+    }
+    
+    /* 工具类 */
+    .flex {
+      display: flex;
+    }
+    
+    .flex-col {
+      flex-direction: column;
+    }
+    
+    .justify-between {
+      justify-content: space-between;
+    }
+    
+    .items-center {
+      align-items: center;
+    }
+    
+    .space-x-2 > * + * {
+      margin-left: 0.5rem;
+    }
+    
+    .space-x-3 > * + * {
+      margin-left: 0.75rem;
+    }
+    
+    .space-y-2 > * + * {
+      margin-top: 0.5rem;
+    }
+    
+    .text-sm {
+      font-size: 0.875rem;
+    }
+    
+    .text-lg {
+      font-size: 1.125rem;
+    }
+    
+    .text-xl {
+      font-size: 1.25rem;
+    }
+    
+    .text-2xl {
+      font-size: 1.5rem;
+    }
+    
+    .font-bold {
+      font-weight: 700;
+    }
+    
+    .font-semibold {
+      font-weight: 600;
+    }
+    
+    .text-gray-500 {
+      color: #6b7280;
+    }
+    
+    .text-gray-600 {
+      color: #4b5563;
+    }
+    
+    .text-white {
+      color: white;
+    }
+    
+    .mb-1 {
+      margin-bottom: 0.25rem;
+    }
+    
+    .mb-3 {
+      margin-bottom: 0.75rem;
+    }
+    
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+    
+    .mb-6 {
+      margin-bottom: 1.5rem;
+    }
+    
+    .mr-1 {
+      margin-right: 0.25rem;
+    }
+    
+    .mr-2 {
+      margin-right: 0.5rem;
+    }
+    
+    .mr-3 {
+      margin-right: 0.75rem;
+    }
+    
+    .w-full {
+      width: 100%;
+    }
+    
+    .w-2 {
+      width: 0.5rem;
+    }
+    
+    .w-3 {
+      width: 0.75rem;
+    }
+    
+    .h-2 {
+      height: 0.5rem;
+    }
+    
+    .h-3 {
+      height: 0.75rem;
+    }
+    
+    .h-10 {
+      height: 2.5rem;
+    }
+    
+    .rounded {
+      border-radius: 0.25rem;
+    }
+    
+    .rounded-full {
+      border-radius: 9999px;
+    }
+    
+    .opacity-70 {
+      opacity: 0.7;
+    }
+    
+    .line-through {
+      text-decoration: line-through;
+    }
+    
+    @media (min-width: 768px) {
+      .md\\:flex-row {
+        flex-direction: row;
+      }
+      
+      .md\\:mb-0 {
+        margin-bottom: 0;
+      }
+      
+      .md\\:items-end {
+        align-items: flex-end;
+      }
+    }
+    
+    /* 动画 */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .modal-footer {
+        flex-direction: column;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .bg-switcher {
+        top: 10px;
+        right: 10px;
+      }
+      
+      .bg-option {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 背景切换按钮 -->
+  <div class="bg-switcher">
+    <div class="bg-option gradient" title="渐变背景" data-bg="gradient"></div>
+    <div class="bg-option solid active" title="纯色背景" data-bg="solid"></div>
+    <div class="bg-option image" title="图片背景" data-bg="image"></div>
+    <div class="bg-option pattern" title="图案背景" data-bg="pattern"></div>
+  </div>
+
+  <!-- 头部导航 -->
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">📋</div>
+          <h1>任务管理系统</h1>
+        </div>
+        
+        <!-- 导航链接 - 桌面版 -->
+        <nav>
+          <a href="#" class="nav-link active" data-view="tasks">
+            <i>📝</i> 任务列表
+          </a>
+          <a href="#" class="nav-link" data-view="courses">
+            <i>📚</i> 课程管理
+          </a>
+          <a href="#" class="nav-link" data-view="progress">
+            <i>📊</i> 进度查看
+          </a>
+          <a href="#" class="nav-link" data-view="reports">
+            <i>📄</i> 生成报告
+          </a>
+        </nav>
+        
+        <!-- 移动端菜单按钮 -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <i>☰</i>
+        </button>
+      </div>
+      
+      <!-- 移动端导航菜单 -->
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="#" class="nav-link active" data-view="tasks">
+          <i>📝</i> 任务列表
+        </a>
+        <a href="#" class="nav-link" data-view="courses">
+          <i>📚</i> 课程管理
+        </a>
+        <a href="#" class="nav-link" data-view="progress">
+          <i>📊</i> 进度查看
+        </a>
+        <a href="#" class="nav-link" data-view="reports">
+          <i>📄</i> 生成报告
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容区域 -->
+  <main class="container">
+    <!-- 任务列表视图 -->
+    <div id="tasksView" class="view">
+      <div class="page-header">
+        <h2 class="page-title">任务列表</h2>
+        <button id="addTaskBtn" class="btn btn-primary">
+          <i>➕</i> 添加任务
+        </button>
+      </div>
+      
+      <div id="taskList" class="space-y-4">
+        <!-- 任务将通过JavaScript动态生成 -->
+      </div>
+    </div>
+
+    <!-- 课程管理视图 -->
+    <div id="coursesView" class="view hidden">
+      <div class="page-header">
+        <h2 class="page-title">课程管理</h2>
+        <button id="addCourseBtn" class="btn btn-primary">
+          <i>➕</i> 添加课程
+        </button>
+      </div>
+      
+      <div id="courseList" class="space-y-4">
+        <!-- 课程将通过JavaScript动态生成 -->
+      </div>
+    </div>
+
+    <!-- 进度查看视图 -->
+    <div id="progressView" class="view hidden">
+      <div class="page-header">
+        <h2 class="page-title">学习进度</h2>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card primary">
+          <div class="stat-value" id="totalTasksCount">0</div>
+          <div class="stat-label">总任务数</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-value" id="completedTasksCount">0</div>
+          <div class="stat-label">已完成任务</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-value" id="pendingTasksCount">0</div>
+          <div class="stat-label">待完成任务</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-value" id="overallProgressPercent">0%</div>
+          <div class="stat-label">总体完成率</div>
+        </div>
+      </div>
+      
+      <div id="progressContent">
+        <!-- 进度内容将通过JavaScript动态生成 -->
+      </div>
+    </div>
+
+    <!-- 报告生成视图 -->
+    <div id="reportsView" class="view hidden">
+      <div class="page-header">
+        <h2 class="page-title">统计报告</h2>
+      </div>
+      
+      <div id="reportsContent">
+        <!-- 报告内容将通过JavaScript动态生成 -->
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2025 任务管理系统 - 让学习更有效率</p>
+    </div>
+  </footer>
+
+  <!-- 课程模态框 -->
+  <div id="courseModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">添加课程</h3>
+        <button class="modal-close" data-modal="courseModal">✕</button>
+      </div>
+      <form id="courseForm">
+        <input type="hidden" id="courseId">
+        <div class="form-group">
+          <label for="courseName" class="form-label">课程名称</label>
+          <input type="text" id="courseName" class="form-input" placeholder="请输入课程名称">
+        </div>
+        <div class="form-group">
+          <label for="courseColor" class="form-label">课程颜色</label>
+          <div class="flex items-center space-x-3">
+            <input type="color" id="courseColor" class="w-10 h-10 border-0 rounded cursor-pointer" value="#4f46e5">
+            <input type="text" id="courseColorText" class="form-input" value="#4f46e5">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary flex-1" data-modal="courseModal">取消</button>
+          <button type="button" id="saveCourseBtn" class="btn btn-primary flex-1">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 任务模态框 -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">添加任务</h3>
+        <button class="modal-close" data-modal="taskModal">✕</button>
+      </div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId">
+        <div class="form-group">
+          <label for="taskTitle" class="form-label">任务标题</label>
+          <input type="text" id="taskTitle" class="form-input" placeholder="请输入任务标题">
+        </div>
+        <div class="form-group">
+          <label for="taskCourseId" class="form-label">关联课程</label>
+          <select id="taskCourseId" class="form-input">
+            <option value="" disabled selected>选择关联课程</option>
+            <!-- 课程选项将通过JavaScript动态生成 -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="taskDueDate" class="form-label">截止日期</label>
+          <input type="date" id="taskDueDate" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="taskPriority" class="form-label">优先级</label>
+          <select id="taskPriority" class="form-input">
+            <option value="low">低</option>
+            <option value="medium" selected>中</option>
+            <option value="high">高</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary flex-1" data-modal="taskModal">取消</button>
+          <button type="button" id="saveTaskBtn" class="btn btn-primary flex-1">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 内联JavaScript -->
+  <script>
+    // 应用程序主模块
+    const App = {
+      // 初始化应用
+      init() {
+        // 初始化数据存储
+        this.initStorage();
+        // 初始化视图
+        this.initView();
+        // 绑定事件
+        this.bindEvents();
+        // 初始化背景切换功能
+        this.initBackgroundSwitcher();
+      },
+
+      // 初始化本地存储和模拟数据
+      initStorage() {
+        // 检查是否有课程数据，如果没有则创建模拟数据
+        if (!localStorage.getItem('courses')) {
+          const mockCourses = [
+            { id: 1, name: '软件工程', color: '#4f46e5' },
+            { id: 2, name: '数据结构', color: '#06b6d4' },
+            { id: 3, name: '算法分析', color: '#10b981' }
+          ];
+          localStorage.setItem('courses', JSON.stringify(mockCourses));
+        }
+
+        // 检查是否有任务数据，如果没有则创建模拟数据
+        if (!localStorage.getItem('tasks')) {
+          const mockTasks = [
+            { id: 1, title: '完成软件设计文档', courseId: 1, dueDate: '2025-12-10', status: 'pending', priority: 'high' },
+            { id: 2, title: '复习链表章节', courseId: 2, dueDate: '2025-12-08', status: 'completed', priority: 'medium' },
+            { id: 3, title: '解决排序算法问题', courseId: 3, dueDate: '2025-12-15', status: 'pending', priority: 'low' }
+          ];
+          localStorage.setItem('tasks', JSON.stringify(mockTasks));
+        }
+      },
+
+      // 初始化视图
+      initView() {
+        // 加载课程列表
+        this.renderCourses();
+        // 加载任务列表
+        this.renderTasks();
+      },
+
+      // 绑定事件
+      bindEvents() {
+        // 导航切换
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.switchView(e.target.dataset.view);
+          });
+        });
+
+        // 移动端菜单切换
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenuBtn && mobileMenu) {
+          mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('show');
+          });
+        }
+
+        // 添加课程按钮
+        document.getElementById('addCourseBtn')?.addEventListener('click', () => {
+          this.showCourseModal();
+        });
+
+        // 保存课程
+        document.getElementById('saveCourseBtn')?.addEventListener('click', () => {
+          this.saveCourse();
+        });
+
+        // 添加任务按钮
+        document.getElementById('addTaskBtn')?.addEventListener('click', () => {
+          this.showTaskModal();
+        });
+
+        // 保存任务
+        document.getElementById('saveTaskBtn')?.addEventListener('click', () => {
+          this.saveTask();
+        });
+
+        // 关闭模态框
+        document.querySelectorAll('.modal-close').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const modalId = btn.dataset.modal;
+            this.hideModal(modalId);
+          });
+        });
+
+        // 颜色选择器同步
+        const courseColor = document.getElementById('courseColor');
+        const courseColorText = document.getElementById('courseColorText');
+        if (courseColor && courseColorText) {
+          courseColor.addEventListener('input', () => {
+            courseColorText.value = courseColor.value;
+          });
+          courseColorText.addEventListener('input', () => {
+            if (/^#[0-9A-F]{6}$/i.test(courseColorText.value)) {
+              courseColor.value = courseColorText.value;
+            }
+          });
+        }
+      },
+
+      // 初始化背景切换功能
+      initBackgroundSwitcher() {
+        const bgOptions = document.querySelectorAll('.bg-option');
+        
+        // 设置默认背景
+        this.setBackground('solid');
+        
+        // 绑定背景切换事件
+        bgOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            // 移除所有active类
+            bgOptions.forEach(opt => opt.classList.remove('active'));
+            // 添加当前active类
+            option.classList.add('active');
+            // 切换背景
+            this.setBackground(option.dataset.bg);
+          });
+        });
+      },
+
+      // 设置背景
+      setBackground(type) {
+        const body = document.body;
+        
+        // 移除所有背景样式
+        body.style.background = '';
+        body.style.backgroundColor = '';
+        
+        // 根据类型设置背景
+        switch(type) {
+          case 'image':
+            body.style.background = "url('https://picsum.photos/seed/taskmanager/1920/1080.jpg') no-repeat center center fixed";
+            body.style.backgroundSize = 'cover';
+            break;
+          case 'gradient':
+            body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            break;
+          case 'solid':
+            body.style.backgroundColor = '#1a365d';
+            break;
+          case 'pattern':
+            body.style.background = "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%23333\"/><circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"rgba(255,255,255,0.1)\" stroke-width=\"0.5\"/><circle cx=\"50\" cy=\"50\" r=\"30\" stroke=\"rgba(255,255,255,0.1)\" stroke-width=\"0.5\"/><circle cx=\"50\" cy=\"50\" r=\"20\" stroke=\"rgba(255,255,255,0.1)\" stroke-width=\"0.5\"/></svg>') repeat";
+            body.style.backgroundSize = '100px 100px';
+            break;
+        }
+        
+        // 保存背景选择到localStorage
+        localStorage.setItem('selectedBackground', type);
+      },
+
+      // 切换视图
+      switchView(viewName) {
+        // 隐藏所有视图
+        document.querySelectorAll('.view').forEach(view => {
+          view.classList.add('hidden');
+        });
+        // 显示选定视图
+        document.getElementById(`${viewName}View`).classList.remove('hidden');
+        // 更新导航激活状态
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.classList.remove('active');
+        });
+        document.querySelector(`.nav-link[data-view="${viewName}"]`).classList.add('active');
+
+        // 根据视图名称加载相应数据
+        if (viewName === 'courses') {
+          this.renderCourses();
+        } else if (viewName === 'tasks') {
+          this.renderTasks();
+        } else if (viewName === 'progress') {
+          this.renderProgress();
+        } else if (viewName === 'reports') {
+          this.renderReports();
+        }
+      },
+
+      // 获取课程数据
+      getCourses() {
+        return JSON.parse(localStorage.getItem('courses') || '[]');
+      },
+
+      // 获取任务数据
+      getTasks() {
+        return JSON.parse(localStorage.getItem('tasks') || '[]');
+      },
+
+      // 渲染课程列表
+      renderCourses() {
+        const courses = this.getCourses();
+        const courseList = document.getElementById('courseList');
+        if (courseList) {
+          courseList.innerHTML = '';
+          courses.forEach(course => {
+            const courseCard = document.createElement('div');
+            courseCard.className = 'card fade-in';
+            courseCard.innerHTML = `
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <div class="course-color-indicator" style="background-color: ${course.color}"></div>
+                  <h3 class="text-lg font-semibold">${course.name}</h3>
+                </div>
+                <div class="flex space-x-2">
+                  <button class="edit-course-btn btn btn-secondary btn-sm" data-id="${course.id}">编辑</button>
+                  <button class="delete-course-btn btn btn-danger btn-sm" data-id="${course.id}">删除</button>
+                </div>
+              </div>
+            `;
+            courseList.appendChild(courseCard);
+          });
+
+          // 绑定课程编辑和删除事件
+          this.bindCourseActions();
+        }
+      },
+
+      // 渲染任务列表
+      renderTasks() {
+        const tasks = this.getTasks();
+        const courses = this.getCourses();
+        const taskList = document.getElementById('taskList');
+        if (taskList) {
+          taskList.innerHTML = '';
+          tasks.forEach(task => {
+            const course = courses.find(c => c.id === task.courseId);
+            const taskCard = document.createElement('div');
+            taskCard.className = `card task-card fade-in ${task.status === 'completed' ? 'completed' : ''}`;
+            
+            // 根据优先级设置类
+            let priorityClass = '';
+            if (task.priority === 'high') priorityClass = 'priority-high';
+            else if (task.priority === 'medium') priorityClass = 'priority-medium';
+            else priorityClass = 'priority-low';
+            
+            taskCard.innerHTML = `
+              <div class="task-priority ${priorityClass}"></div>
+              <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-3 md:mb-0">
+                  <h3 class="text-lg font-semibold mb-1 task-title ${task.status === 'completed' ? 'line-through text-gray-500' : ''}">${task.title}</h3>
+                  <div class="flex items-center text-sm text-gray-600 mb-1">
+                    <div class="w-2 h-2 rounded-full mr-2" style="background-color: ${course?.color || '#6b7280'}"></div>
+                    <span>${course?.name || '未分类'}</span>
+                  </div>
+                  <div class="text-sm text-gray-500">截止日期: ${task.dueDate}</div>
+                  <div class="text-sm text-gray-500">优先级: ${this.getPriorityText(task.priority)}</div>
+                </div>
+                <div class="flex flex-col items-end space-y-2">
+                  <div class="flex space-x-2">
+                    <button class="toggle-status-btn btn btn-secondary btn-sm" data-id="${task.id}">
+                      ${task.status === 'pending' ? '标记完成' : '标记待办'}
+                    </button>
+                    <button class="edit-task-btn btn btn-secondary btn-sm" data-id="${task.id}">编辑</button>
+                    <button class="delete-task-btn btn btn-danger btn-sm" data-id="${task.id}">删除</button>
+                  </div>
+                </div>
+              </div>
+            `;
+            taskList.appendChild(taskCard);
+          });
+
+          // 绑定任务操作事件
+          this.bindTaskActions();
+        }
+      },
+
+      // 渲染进度视图
+      renderProgress() {
+        const courses = this.getCourses();
+        const tasks = this.getTasks();
+        const progressContent = document.getElementById('progressContent');
+        
+        // 更新统计数据
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(task => task.status === 'completed').length;
+        const pendingTasks = totalTasks - completedTasks;
+        const overallProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        
+        document.getElementById('totalTasksCount').textContent = totalTasks;
+        document.getElementById('completedTasksCount').textContent = completedTasks;
+        document.getElementById('pendingTasksCount').textContent = pendingTasks;
+        document.getElementById('overallProgressPercent').textContent = overallProgress + '%';
+        
+        if (progressContent) {
+          progressContent.innerHTML = '';
+          
+          // 计算每个课程的进度
+          courses.forEach(course => {
+            const courseTasks = tasks.filter(task => task.courseId === course.id);
+            const completedTasks = courseTasks.filter(task => task.status === 'completed');
+            const progressPercent = courseTasks.length > 0 ? Math.round((completedTasks.length / courseTasks.length) * 100) : 0;
+            
+            const progressCard = document.createElement('div');
+            progressCard.className = 'card fade-in';
+            progressCard.innerHTML = `
+              <div class="mb-2 flex justify-between items-center">
+                <h3 class="text-lg font-semibold">${course.name}</h3>
+                <span class="text-sm text-gray-600">${completedTasks.length}/${courseTasks.length} 已完成</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill progress-primary" style="width: ${progressPercent}%"></div>
+              </div>
+              <div class="text-center mt-2 text-sm font-medium">${progressPercent}%</div>
+            `;
+            progressContent.appendChild(progressCard);
+          });
+          
+          // 总体进度
+          const totalProgressCard = document.createElement('div');
+          totalProgressCard.className = 'card fade-in';
+          totalProgressCard.innerHTML = `
+            <div class="mb-2 flex justify-between items-center">
+              <h3 class="text-lg font-semibold">总体进度</h3>
+              <span class="text-sm text-gray-600">${completedTasks}/${totalTasks} 已完成</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill progress-success" style="width: ${overallProgress}%"></div>
+            </div>
+            <div class="text-center mt-2 text-sm font-medium">${overallProgress}%</div>
+          `;
+          progressContent.appendChild(totalProgressCard);
+        }
+      },
+
+      // 渲染报告视图
+      renderReports() {
+        const courses = this.getCourses();
+        const tasks = this.getTasks();
+        const reportsContent = document.getElementById('reportsContent');
+        
+        if (reportsContent) {
+          reportsContent.innerHTML = '';
+          
+          // 课程统计
+          const courseStatsCard = document.createElement('div');
+          courseStatsCard.className = 'card fade-in';
+          courseStatsCard.innerHTML = `
+            <h3 class="text-lg font-semibold mb-3">课程统计</h3>
+            <div class="stats-grid">
+              <div class="stat-card primary">
+                <div class="stat-value">${courses.length}</div>
+                <div class="stat-label">总课程数</div>
+              </div>
+              <div class="stat-card success">
+                <div class="stat-value">${courses.filter(course => tasks.some(task => task.courseId === course.id)).length}</div>
+                <div class="stat-label">有任务的课程</div>
+              </div>
+            </div>
+          `;
+          reportsContent.appendChild(courseStatsCard);
+          
+          // 任务统计
+          const taskStatsCard = document.createElement('div');
+          taskStatsCard.className = 'card fade-in';
+          taskStatsCard.innerHTML = `
+            <h3 class="text-lg font-semibold mb-3">任务统计</h3>
+            <div class="stats-grid">
+              <div class="stat-card primary">
+                <div class="stat-value">${tasks.length}</div>
+                <div class="stat-label">总任务数</div>
+              </div>
+              <div class="stat-card success">
+                <div class="stat-value">${tasks.filter(task => task.status === 'completed').length}</div>
+                <div class="stat-label">已完成</div>
+              </div>
+              <div class="stat-card warning">
+                <div class="stat-value">${tasks.filter(task => task.status === 'pending').length}</div>
+                <div class="stat-label">待完成</div>
+              </div>
+              <div class="stat-card danger">
+                <div class="stat-value">${tasks.length > 0 ? Math.round((tasks.filter(task => task.status === 'completed').length / tasks.length) * 100) : 0}%</div>
+                <div class="stat-label">完成率</div>
+              </div>
+            </div>
+          `;
+          reportsContent.appendChild(taskStatsCard);
+          
+          // 按课程分组的任务统计
+          const courseTaskStatsCard = document.createElement('div');
+          courseTaskStatsCard.className = 'card fade-in';
+          courseTaskStatsCard.innerHTML = `
+            <h3 class="text-lg font-semibold mb-3">课程任务详情</h3>
+            <div class="space-y-4">
+              ${courses.map(course => {
+                const courseTasks = tasks.filter(task => task.courseId === course.id);
+                const completedTasks = courseTasks.filter(task => task.status === 'completed');
+                
+                if (courseTasks.length > 0) {
+                  return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div class="flex items-center">
+                        <div class="w-3 h-3 rounded-full mr-3" style="background-color: ${course.color}"></div>
+                        <h4 class="font-medium">${course.name}</h4>
+                      </div>
+                      <div class="text-sm text-gray-600">
+                        <span class="mr-3">总任务: ${courseTasks.length}</span>
+                        <span class="mr-3">已完成: ${completedTasks.length}</span>
+                        <span>完成率: ${Math.round((completedTasks.length / courseTasks.length) * 100)}%</span>
+                      </div>
+                    </div>
+                  `;
+                } else {
+                  return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div class="flex items-center">
+                        <div class="w-3 h-3 rounded-full mr-3" style="background-color: ${course.color}"></div>
+                        <h4 class="font-medium">${course.name}</h4>
+                      </div>
+                      <div class="text-sm text-gray-600">暂无任务</div>
+                    </div>
+                  `;
+                }
+              }).join('')}
+            </div>
+          `;
+          reportsContent.appendChild(courseTaskStatsCard);
+        }
+      },
+
+      // 获取优先级文本
+      getPriorityText(priority) {
+        switch (priority) {
+          case 'high': return '高';
+          case 'medium': return '中';
+          case 'low': return '低';
+          default: return '中';
+        }
+      },
+
+      // 绑定课程操作事件
+      bindCourseActions() {
+        // 编辑课程
+        document.querySelectorAll('.edit-course-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const courseId = parseInt(btn.dataset.id);
+            this.editCourse(courseId);
+          });
+        });
+
+        // 删除课程
+        document.querySelectorAll('.delete-course-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const courseId = parseInt(btn.dataset.id);
+            if (confirm('确定要删除这个课程吗？相关的任务将不会被删除。')) {
+              this.deleteCourse(courseId);
+            }
+          });
+        });
+      },
+
+      // 绑定任务操作事件
+      bindTaskActions() {
+        // 切换任务状态
+        document.querySelectorAll('.toggle-status-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const taskId = parseInt(btn.dataset.id);
+            this.toggleTaskStatus(taskId);
+          });
+        });
+
+        // 编辑任务
+        document.querySelectorAll('.edit-task-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const taskId = parseInt(btn.dataset.id);
+            this.editTask(taskId);
+          });
+        });
+
+        // 删除任务
+        document.querySelectorAll('.delete-task-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const taskId = parseInt(btn.dataset.id);
+            if (confirm('确定要删除这个任务吗？')) {
+              this.deleteTask(taskId);
+            }
+          });
+        });
+      },
+
+      // 显示课程模态框
+      showCourseModal(courseId = null) {
+        const modal = document.getElementById('courseModal');
+        const form = document.getElementById('courseForm');
+        const courseNameInput = document.getElementById('courseName');
+        const courseColorInput = document.getElementById('courseColor');
+        const courseColorTextInput = document.getElementById('courseColorText');
+        
+        // 重置表单
+        form.reset();
+        
+        if (courseId) {
+          // 编辑模式
+          const courses = this.getCourses();
+          const course = courses.find(c => c.id === courseId);
+          if (course) {
+            document.getElementById('courseId').value = course.id;
+            courseNameInput.value = course.name;
+            courseColorInput.value = course.color;
+            courseColorTextInput.value = course.color;
+          }
+        } else {
+          // 添加模式
+          document.getElementById('courseId').value = '';
+        }
+        
+        this.showModal('courseModal');
+      },
+
+      // 显示任务模态框
+      showTaskModal(taskId = null) {
+        const modal = document.getElementById('taskModal');
+        const form = document.getElementById('taskForm');
+        const taskTitleInput = document.getElementById('taskTitle');
+        const taskCourseSelect = document.getElementById('taskCourseId');
+        const taskDueDateInput = document.getElementById('taskDueDate');
+        const taskPrioritySelect = document.getElementById('taskPriority');
+        
+        // 重置表单
+        form.reset();
+        
+        // 填充课程选项
+        const courses = this.getCourses();
+        taskCourseSelect.innerHTML = '<option value="" disabled selected>选择关联课程</option>';
+        courses.forEach(course => {
+          const option = document.createElement('option');
+          option.value = course.id;
+          option.textContent = course.name;
+          taskCourseSelect.appendChild(option);
+        });
+        
+        if (taskId) {
+          // 编辑模式
+          const tasks = this.getTasks();
+          const task = tasks.find(t => t.id === taskId);
+          if (task) {
+            document.getElementById('taskId').value = task.id;
+            taskTitleInput.value = task.title;
+            taskCourseSelect.value = task.courseId;
+            taskDueDateInput.value = task.dueDate;
+            taskPrioritySelect.value = task.priority || 'medium';
+          }
+        } else {
+          // 添加模式
+          document.getElementById('taskId').value = '';
+          taskPrioritySelect.value = 'medium';
+        }
+        
+        this.showModal('taskModal');
+      },
+
+      // 保存课程
+      saveCourse() {
+        const courseId = document.getElementById('courseId').value;
+        const courseName = document.getElementById('courseName').value.trim();
+        const courseColor = document.getElementById('courseColor').value;
+        
+        if (!courseName) {
+          alert('请输入课程名称');
+          return;
+        }
+        
+        const courses = this.getCourses();
+        
+        if (courseId) {
+          // 更新现有课程
+          const courseIndex = courses.findIndex(c => c.id === parseInt(courseId));
+          if (courseIndex !== -1) {
+            courses[courseIndex].name = courseName;
+            courses[courseIndex].color = courseColor;
+          }
+        } else {
+          // 添加新课程
+          const newCourse = {
+            id: Date.now(),
+            name: courseName,
+            color: courseColor
+          };
+          courses.push(newCourse);
+        }
+        
+        localStorage.setItem('courses', JSON.stringify(courses));
+        this.renderCourses();
+        this.hideModal('courseModal');
+      },
+
+      // 保存任务
+      saveTask() {
+        const taskId = document.getElementById('taskId').value;
+        const taskTitle = document.getElementById('taskTitle').value.trim();
+        const taskCourseId = document.getElementById('taskCourseId').value;
+        const taskDueDate = document.getElementById('taskDueDate').value;
+        const taskPriority = document.getElementById('taskPriority').value;
+        
+        if (!taskTitle) {
+          alert('请输入任务标题');
+          return;
+        }
+        
+        if (!taskCourseId) {
+          alert('请选择关联课程');
+          return;
+        }
+        
+        if (!taskDueDate) {
+          alert('请选择截止日期');
+          return;
+        }
+        
+        const tasks = this.getTasks();
+        
+        if (taskId) {
+          // 更新现有任务
+          const taskIndex = tasks.findIndex(t => t.id === parseInt(taskId));
+          if (taskIndex !== -1) {
+            tasks[taskIndex].title = taskTitle;
+            tasks[taskIndex].courseId = parseInt(taskCourseId);
+            tasks[taskIndex].dueDate = taskDueDate;
+            tasks[taskIndex].priority = taskPriority;
+          }
+        } else {
+          // 添加新任务
+          const newTask = {
+            id: Date.now(),
+            title: taskTitle,
+            courseId: parseInt(taskCourseId),
+            dueDate: taskDueDate,
+            priority: taskPriority,
+            status: 'pending'
+          };
+          tasks.push(newTask);
+        }
+        
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        this.renderTasks();
+        this.hideModal('taskModal');
+      },
+
+      // 编辑课程
+      editCourse(courseId) {
+        this.showCourseModal(courseId);
+      },
+
+      // 删除课程
+      deleteCourse(courseId) {
+        const courses = this.getCourses();
+        const updatedCourses = courses.filter(c => c.id !== courseId);
+        localStorage.setItem('courses', JSON.stringify(updatedCourses));
+        this.renderCourses();
+      },
+
+      // 切换任务状态
+      toggleTaskStatus(taskId) {
+        const tasks = this.getTasks();
+        const taskIndex = tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+          tasks[taskIndex].status = tasks[taskIndex].status === 'pending' ? 'completed' : 'pending';
+          localStorage.setItem('tasks', JSON.stringify(tasks));
+          this.renderTasks();
+        }
+      },
+
+      // 编辑任务
+      editTask(taskId) {
+        this.showTaskModal(taskId);
+      },
+
+      // 删除任务
+      deleteTask(taskId) {
+        const tasks = this.getTasks();
+        const updatedTasks = tasks.filter(t => t.id !== taskId);
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+        this.renderTasks();
+      },
+
+      // 显示模态框
+      showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.add('show');
+        }
+      },
+
+      // 隐藏模态框
+      hideModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.remove('show');
+        }
+      },
+
+      // 隐藏所有模态框
+      hideAllModals() {
+        document.querySelectorAll('.modal').forEach(modal => {
+          modal.classList.remove('show');
+        });
+      }
+    };
+
+    // 初始化应用
+    document.addEventListener('DOMContentLoaded', () => {
+      App.init();
+    });
+  </script>
+</body>
+</html>
